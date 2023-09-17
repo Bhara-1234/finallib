@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	
+		<button id="pub" onclick="getPublishers()">Get Publishers</button>
+        <table id="tab" border="1"></table>
+<script>
+    function getPublishers() {
+		var table = document.getElementById("tab");
+		table.innerHTML = ``;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/publishers", true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    var size = data.length;
+                    var tab = document.getElementById("tab");
+                    console.log(data);
+                    data.forEach(function (x) {
+                        var tr = document.createElement("tr");
+                        var td1 = document.createElement("td");
+                        var td2 = document.createElement("td");
+                        var td3 = document.createElement("td"); // Change to td element
+                        var link = document.createElement("a"); // Create an anchor tag
+                        link.href = "booklist.html"; // Set the href attribute to the destination HTML page
+                        link.textContent = "BookList";
+                        td1.textContent = x.publisherid;
+                        td2.textContent = x.publishername;
+                        td3.appendChild(link); // Append the anchor tag to the td element
+                        tr.appendChild(td1);
+                        tr.appendChild(td2);
+                        tr.appendChild(td3);
+                        tab.appendChild(tr);
+                    });
+                } else {
+                    // Handle errors or non-200 status codes here
+                    console.error("Error: " + xhr.status);
+                }
+            }
+        }
+        xhr.send();
+    }
+</script>
+
+
+</body>
+</html>

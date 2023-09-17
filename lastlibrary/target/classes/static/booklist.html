@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Book Management</title>
+</head>
+
+<body>
+    <button id="book" onclick="getBooks()">Get Books</button>
+    BookId: <input type="text" id="bid" readonly>
+    PublisherId: <input type="text" id="pid">
+    IsbnNumber: <input type="text" id="is">
+    <input type="button" value="Add" onclick="addBook()">
+    <input type="button" value="Save" onclick="saveBook()">
+    <input type="button" value="First" onclick="firstBook()">
+    <input type="button" value="Last" onclick="lastBook()">
+    <input type="button" value="Next" onclick="nextBook()">
+    <input type="button" value="Previous" onclick="previousBook()">
+
+    <table id="tab" border="1"></table>
+
+    <script>
+        var index = 0;
+
+       function getBooks() {
+    var table = document.getElementById("tab");
+    table.innerHTML = ``;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/books", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                var size = data.length;
+                var tab = document.getElementById("tab");
+                console.log(data);
+                data.forEach(function (x) {
+                    var tr = document.createElement("tr");
+                    var td1 = document.createElement("td");
+                    var td2 = document.createElement("td");
+                    var td4 = document.createElement("td");
+
+                    var td3 = document.createElement("td");
+                    var td5 = document.createElement("td");
+
+                    var button = document.createElement("button");
+                    var button2 = document.createElement("button");
+                    button.onclick = function () {
+                        updateBook(x);
+                    }
+                    button2.onclick = function () {
+                        deleteBook(x.bookid);
+                    }
+                    button.textContent = "Update";
+                    button2.textContent = "Delete";
+                    td1.textContent = x.bookid;
+                    td2.textContent = x.publisherid;
+                    td4.textContent = x.isbnnumber
+                    td3.appendChild(button);
+                    td5.appendChild(button2);
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td4);
+                    tr.appendChild(td3);
+                    tr.appendChild(td5);
+                    tab.appendChild(tr);
+                });
+            } else {
+                // Handle errors or non-200 status codes here
+                console.error("Error: " + xhr.status);
+            }
+        }
+    }
+    xhr.send();
+}
+
+
+        function updateBook(x) {
+            document.getElementById("bid").value = x.bookid;
+            document.getElementById("pid").value = x.publisherid;
+            document.getElementById("is").value = x.isbnnumber;
+        }
+
+        function addBook() {
+            var data = {
+                bookid: document.getElementById("bid").value,
+                publisherid: document.getElementById("pid").value,
+                isbnnumber: document.getElementById("is").value
+            };
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/addBook", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            var json = JSON.stringify(data);
+            xhr.send(json);
+            getBooks();
+        }
+
+        function deleteBook(id) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/deleteBook/" + id, true);
+            xhr.send();
+            getBooks();
+        }
+
+        function saveBook() {
+            var data = {
+                bookid: document.getElementById("bid").value,
+                publisherid: document.getElementById("pid").value,
+                isbnnumber: document.getElementById("is").value
+            }
+            var json = JSON.stringify(data);
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/save", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(json);
+            getBooks();
+        }
+
+        function firstBook() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/first", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    console.log(data);
+                    var bookid = document.getElementById("bid");
+                    var publisherid = document.getElementById("pid");
+                    var isbn = document.getElementById("is");
+                    bookid.value = data.bookid;
+                    publisherid.value = data.publisherid;
+                    isbn.value = data.isbnnumber;
+                }
+            }
+            xhr.send();
+        }
+
+        function lastBook() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/last", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    console.log(data);
+                    var bookid = document.getElementById("bid");
+                    var publisherid = document.getElementById("pid");
+                    var isbn = document.getElementById("is");
+                    bookid.value = data.bookid;
+                    publisherid.value = data.publisherid;
+                    isbn.value = data.isbnnumber;
+                }
+            }
+            xhr.send();
+        }
+
+        function nextBook() {
+            index++;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/next/" + index, true)
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    console.log(data);
+                    var bookid = document.getElementById("bid");
+                    var publisherid = document.getElementById("pid");
+                    var isbn = document.getElementById("is");
+                    bookid.value = data.bookid;
+                    publisherid.value = data.publisherid;
+                    isbn.value = data.isbnnumber;
+                }
+            }
+            xhr.send();
+        }
+
+       function previousBook() {
+    if (index > 0) {
+        index--;
+        console.log("Previous index:", index); // Add this line for debugging
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/previous/" + index, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                console.log(data);
+                var bookid = document.getElementById("bid");
+                var publisherid = document.getElementById("pid");
+                var isbn = document.getElementById("is");
+                bookid.value = data.bookid;
+                publisherid.value = data.publisherid;
+                isbn.value = data.isbnnumber;
+            }
+        }
+        xhr.send();
+    }
+}
+
+    </script>
+</body>
+
+</html>
